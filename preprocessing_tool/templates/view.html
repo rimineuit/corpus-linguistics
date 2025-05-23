@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xem file: {{ file_path }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1200px;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        h1 {
+            font-size: 1.8rem;
+            color: #343a40;
+            margin-bottom: 1rem;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+            transform: translateY(-2px);
+        }
+        .table {
+            font-size: 0.9rem;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 0.25rem;
+            overflow: hidden;
+        }
+        th, td {
+            word-break: break-word;
+            white-space: pre-wrap;
+            padding: 0.75rem;
+            vertical-align: middle;
+        }
+        th {
+            background-color: #e9ecef;
+            color: #343a40;
+            font-weight: 600;
+            text-align: left;
+        }
+        tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+        .table-bordered {
+            border: 1px solid #dee2e6;
+        }
+        .alert {
+            border-radius: 0.25rem;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            .table {
+                font-size: 0.8rem;
+            }
+            th, td {
+                padding: 0.5rem;
+            }
+            .btn {
+                padding: 0.4rem 1rem;
+                font-size: 0.9rem;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Xem nội dung file: {{ file_path }}</h1>
+        <a href="{{ url_for('index') }}" class="btn btn-primary mb-3">Quay lại</a>
+        {% if content.error %}
+        <div class="alert alert-danger">{{ content.error }}</div>
+        {% else %}
+            {% if is_jsonl %}
+            <!-- Hiển thị JSONL dạng bảng -->
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Tokens</th>
+                        <th>BIO Labels</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in content %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>[{{ item.tokens | join(', ') }}]</td>
+                        <td>[{{ item.bio_labels | join(', ') }}]</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <!-- Hiển thị JSON dạng bảng -->
+            {% if content %}
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        {% if content[0] %}
+                        {% for key in content[0].keys() %}
+                        <th>{{ key }}</th>
+                        {% endfor %}
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in content %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        {% for key in item.keys() %}
+                        <td>{{ item[key] }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="alert alert-warning">File rỗng</div>
+            {% endif %}
+            {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html>
